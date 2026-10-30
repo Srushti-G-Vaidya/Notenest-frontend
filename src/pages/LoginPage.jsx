@@ -33,6 +33,10 @@ function LoginPage() {
         username,
         password,
       });
+      console.log(response)
+      if(response.status !== 200){
+        throw new Error("invalid credentials")
+      }
 
       console.log(response.data);
       localStorage.setItem("token",response.data.token)

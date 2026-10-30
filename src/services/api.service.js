@@ -51,3 +51,25 @@ export function getbyId(id){
 export function deletebyId(id){
     return api.delete(`/file/${id}`)
 }
+
+export function addeditor(id, data) {
+    return api.post(`/file/${id}/editors`, data);
+}
+
+export function addviewer(id,data){
+    return api.post(`/file/${id}/viewers`,data)
+}
+
+export function removeeditor(id, data) {
+    return api.delete(`/file/${id}/editors`, { data });
+}
+
+export function removeviewer(id, data) {
+    return api.delete(`/file/${id}/viewers`, { data });
+}
+
+
+
+export function updateFile(id, data) {
+    return api.patch(`/file/${id}`, data);
+}

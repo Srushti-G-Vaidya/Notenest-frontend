@@ -4,35 +4,37 @@ import { isLoggedin } from "../services/auth.service";
 import { getfiles } from "../services/api.service";
 
 function Home() {
-    const [loginState, _] = useState(isLoggedin());
+    const [loginState] = useState(isLoggedin());
     const [notes, setNotes] = useState([]);
     const navigate = useNavigate();
 
+    const username = localStorage.getItem("username");
+
     async function loadfiles() {
         try {
-            let res = await getfiles();
-            console.log(res.data.data);
-            setNotes(res.data.data);
-        } catch {}
+            const res = await getfiles();
+            console.log(res.data);
+            setNotes(res.data.files || res.data.data || []);
+        } catch (error) {
+            console.error("Error loading notes:", error);
+        }
     }
 
     useEffect(() => {
         if (!loginState) {
             navigate("/login");
+            return;
         }
 
         loadfiles();
     }, []);
 
-    // Sample notes
-    // const notes = [
-    //     // { id: 1, title: "React Learning", date: "Oct 27, 2026" },
-    //     // { id: 2, title: "Backend Development", date: "Oct 25, 2026" },
-    //     // { id: 3, title: "Project Ideas", date: "Oct 23, 2026" },
-    //     // { id: 4, title: "Interview Preparation", date: "Oct 20, 2026" },
-    //     // { id: 5, title: "Daily Tasks", date: "Oct 18, 2026" },
-    //     // { id: 6, title: "Important Concepts", date: "Oct 15, 2026" },
-    // ];
+   function handleLogout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    localStorage.clear()
+    navigate("/login", { replace: true });
+}
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -44,10 +46,19 @@ function Home() {
                 {/* Profile */}
                 <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 font-bold text-indigo-600">
-                        S
+                        {username ? username.charAt(0).toUpperCase() : "U"}
                     </div>
 
-                    <span className="font-medium text-gray-700">Srushti</span>
+                    <span className="font-medium text-gray-700">
+                        {username || "User"}
+                    </span>
+
+                    <button
+                        onClick={handleLogout}
+                        className="rounded-lg bg-red-100 px-4 py-2 font-medium text-red-600 transition hover:bg-red-200"
+                    >
+                        Logout
+                    </button>
                 </div>
             </nav>
 
@@ -92,11 +103,8 @@ function Home() {
                 ) : (
                     <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                         {notes.map((note) => (
-                            <NavLink to={`/file/${note._id}`}>
-                                <div
-                                    key={note._id}
-                                    className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
-                                >
+                            <NavLink to={`/file/${note._id}`} key={note._id}>
+                                <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
                                     {/* Note Icon */}
                                     <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-indigo-50 text-xl">
                                         📝
